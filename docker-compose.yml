@@ -1,5 +1,7 @@
 version: "3.9"
 services:
+
+  # Postgres database
   postgres:
     image: postgres:latest
     environment:
@@ -9,6 +11,8 @@ services:
       - "55000:5432"
     expose:
       - "5432"
+
+  # DynamoDB database
   dynamodb:
     image: amazon/dynamodb-local:latest
     environment:
@@ -16,7 +20,9 @@ services:
       - AWS_SECRET_ACCESS_KEY=AION_SECRET
     expose:
       - "8000"
-  mentorsuccess-server:
+
+  # Backend
+  services:
     image: 661143960593.dkr.ecr.us-west-2.amazonaws.com/mentorsuccess-server:latest
     depends_on:
       - postgres
@@ -28,21 +34,25 @@ services:
       - "8080:8080"
     expose:
       - 8080
-  mentorsuccess-lpg:
+
+  # Learning pathway generator
+  lpg:
     image: 661143960593.dkr.ecr.us-west-2.amazonaws.com/mentorsuccess-lpg:latest
     environment:
       - AMAZON_DYNAMODB_ENDPOINT=http://dynamodb:8000
       - SPRING_PROFILES_ACTIVE=docker
       - ENVIRONMENT_NAME=test
       - AMAZON_REGION=us-west-2
-      - SPRING_CLOUD_DISCOVERY_CLIENT_SIMPLE_INSTANCES_BOOKS_0_URI=http://mentorsuccess-server:8080
-      - SPRING_CLOUD_DISCOVERY_CLIENT_SIMPLE_INSTANCES_GAMES_0_URI=http://mentorsuccess-server:8080
-      - SPRING_CLOUD_DISCOVERY_CLIENT_SIMPLE_INSTANCES_SCHOOLS_0_URI=http://mentorsuccess-server:8080
-      - SPRING_CLOUD_DISCOVERY_CLIENT_SIMPLE_INSTANCES_STUDENTS_0_URI=http://mentorsuccess-server:8080
+      - SPRING_CLOUD_DISCOVERY_CLIENT_SIMPLE_INSTANCES_BOOKS_0_URI=http://services:8080
+      - SPRING_CLOUD_DISCOVERY_CLIENT_SIMPLE_INSTANCES_GAMES_0_URI=http://services:8080
+      - SPRING_CLOUD_DISCOVERY_CLIENT_SIMPLE_INSTANCES_SCHOOLS_0_URI=http://services:8080
+      - SPRING_CLOUD_DISCOVERY_CLIENT_SIMPLE_INSTANCES_STUDENTS_0_URI=http://services:8080
       - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=https://cognito-idp.us-west-2.amazonaws.com/us-west-2_EBQBuK2yn/.well-known/jwks.json
     ports:
       - "8081:8080"
-  mentorsuccess-ui:
+
+  # Front end
+  ui:
     image: 661143960593.dkr.ecr.us-west-2.amazonaws.com/mentorsuccess-ui:latest
     # build: ../mentorsuccess-ui
     environment:
