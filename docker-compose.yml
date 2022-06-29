@@ -1,0 +1,57 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_PASSWORD=allgr899
+      - POSTGRES_DB=mentorsuccess
+    ports:
+      - "55000:5432"
+    expose:
+      - "5432"
+  dynamodb:
+    image: amazon/dynamodb-local:latest
+    environment:
+      - AWS_ACCESS_KEY_ID=AION_KEY
+      - AWS_SECRET_ACCESS_KEY=AION_SECRET
+    expose:
+      - "8000"
+  mentorsuccess-server:
+    image: 661143960593.dkr.ecr.us-west-2.amazonaws.com/mentorsuccess-server:latest
+    depends_on:
+      - postgres
+    environment:
+      - spring.profiles.active=postgres
+      - spring.datasource.url=jdbc:postgresql://postgres:5432/mentorsuccess
+      - spring.datasource.password=allgr899
+    ports:
+      - "8080:8080"
+    expose:
+      - 8080
+  mentorsuccess-lpg:
+    image: 661143960593.dkr.ecr.us-west-2.amazonaws.com/mentorsuccess-lpg:latest
+    environment:
+      - AMAZON_DYNAMODB_ENDPOINT=http://dynamodb:8000
+      - SPRING_PROFILES_ACTIVE=docker
+      - ENVIRONMENT_NAME=test
+      - AMAZON_REGION=us-west-2
+      - SPRING_CLOUD_DISCOVERY_CLIENT_SIMPLE_INSTANCES_BOOKS_0_URI=http://mentorsuccess-server:8080
+      - SPRING_CLOUD_DISCOVERY_CLIENT_SIMPLE_INSTANCES_GAMES_0_URI=http://mentorsuccess-server:8080
+      - SPRING_CLOUD_DISCOVERY_CLIENT_SIMPLE_INSTANCES_SCHOOLS_0_URI=http://mentorsuccess-server:8080
+      - SPRING_CLOUD_DISCOVERY_CLIENT_SIMPLE_INSTANCES_STUDENTS_0_URI=http://mentorsuccess-server:8080
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=https://cognito-idp.us-west-2.amazonaws.com/us-west-2_EBQBuK2yn/.well-known/jwks.json
+    ports:
+      - "8081:8080"
+  mentorsuccess-ui:
+    image: 661143960593.dkr.ecr.us-west-2.amazonaws.com/mentorsuccess-ui:latest
+    # build: ../mentorsuccess-ui
+    environment:
+      - API_URL=http://localhost:8080
+      - COGNITO_BASE_URL=mentorsuccess-localhost.auth.us-west-2.amazoncognito.com
+      - COGNITO_CLIENT_ID=2j1eb0o8qfsbrpaqsftd879c79
+      - IS_PRODUCTION=false
+      - LOGOUT_TOKEN_REDIRECT=http://localhost:4200/handleLogout
+      - LPG_URL=http://localhost:8081
+      - TOKEN_REDIRECT=http://localhost:4200/receiveToken
+    ports:
+      - "4200:80"
