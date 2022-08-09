@@ -18,6 +18,8 @@ services:
     environment:
       - AWS_ACCESS_KEY_ID=AION_KEY
       - AWS_SECRET_ACCESS_KEY=AION_SECRET
+    ports:
+      - "8000:8000"
     expose:
       - "8000"
 
