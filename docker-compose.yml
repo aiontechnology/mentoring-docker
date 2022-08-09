@@ -32,8 +32,6 @@ services:
       - spring.datasource.password=allgr899
     ports:
       - "8080:8080"
-    expose:
-      - 8080
 
   # Learning pathway generator
   lpg:
