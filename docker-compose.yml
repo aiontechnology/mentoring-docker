@@ -25,7 +25,7 @@ services:
 
   # Backend
   services:
-    image: 661143960593.dkr.ecr.us-west-2.amazonaws.com/mentorsuccess-server:latest
+    image: 881490093754.dkr.ecr.us-west-2.amazonaws.com/services:latest
     depends_on:
       - postgres
     environment:
@@ -37,7 +37,7 @@ services:
 
   # Learning pathway generator
   lpg:
-    image: 661143960593.dkr.ecr.us-west-2.amazonaws.com/mentorsuccess-lpg:latest
+    image: 881490093754.dkr.ecr.us-west-2.amazonaws.com/lpg:latest
     environment:
       - AMAZON_DYNAMODB_ENDPOINT=http://dynamodb:8000
       - SPRING_PROFILES_ACTIVE=docker
@@ -53,7 +53,7 @@ services:
 
   # Front end
   ui:
-    image: 661143960593.dkr.ecr.us-west-2.amazonaws.com/mentorsuccess-ui:latest
+    image: 881490093754.dkr.ecr.us-west-2.amazonaws.com/ui:latest
     # build: ../mentorsuccess-ui
     environment:
       - API_URL=http://localhost:8080
